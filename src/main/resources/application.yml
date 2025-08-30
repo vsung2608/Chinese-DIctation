@@ -17,6 +17,13 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 application:
   security:
     jwt:
@@ -34,4 +41,5 @@ logging:
     org.springframework.web: DEBUG  # Log cho Spring Web (REST API)
     org.springframework.http.server: DEBUG  # Log request & response
     org.springframework.security: DEBUG  # Log bảo mật (nếu dùng Spring Security)
+
 

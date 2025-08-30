@@ -4,8 +4,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.core.internal.Function;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -13,8 +16,11 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class JwtService {
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
@@ -22,7 +28,9 @@ public class JwtService {
     @Value("${application.security.jwt.secret-key}")
     private String jwtSecretKey;
 
-    public String generateToken(UserDetails userDetails) {
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    private String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
@@ -79,5 +87,40 @@ public class JwtService {
 
     public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date(System.currentTimeMillis()));
+    }
+
+    public void addTokenToBlackList(String token){
+        try {
+            Claims claims = extractAllClaims(token);
+            String tokenId = claims.get("tokenId").toString();
+
+            if (isTokenExpired(token)) {
+                // Tính thời gian còn lại đến khi token hết hạn
+                long ttl = extractExpiration(token).getTime() - System.currentTimeMillis();
+
+                // Lưu token vào blacklist với TTL
+                redisTemplate.opsForValue().set(tokenId, "blacklisted", ttl, TimeUnit.MILLISECONDS);
+
+                log.info("Token {} added to blacklist for user: %s".formatted(tokenId));
+            }
+
+        } catch (Exception e) {
+            log.error("Error adding token to blacklist: {}", e.getMessage());
+            throw new RuntimeException("Failed to blacklist token", e);
+        }
+    }
+
+    public boolean isTokenInBlackList(String token){
+        try {
+            Claims claims = extractAllClaims(token);
+            String tokenId = claims.get("tokenId").toString();
+
+            Boolean exists = redisTemplate.hasKey(tokenId);
+            return exists != null && exists;
+
+        } catch (Exception e) {
+            log.warn("Error checking token blacklist status: {}", e.getMessage());
+            return false;
+        }
     }
 }

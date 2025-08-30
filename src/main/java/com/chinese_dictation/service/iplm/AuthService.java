@@ -5,6 +5,7 @@ import com.chinese_dictation.exception.BusinessError;
 import com.chinese_dictation.exception.BusinessException;
 import com.chinese_dictation.mapper.UserMapper;
 import com.chinese_dictation.model.dto.request.LoginRequest;
+import com.chinese_dictation.model.dto.request.RefreshTokenRequest;
 import com.chinese_dictation.model.dto.request.RegistrationRequest;
 import com.chinese_dictation.model.dto.response.AuthResponse;
 import com.chinese_dictation.model.dto.response.UserResponse;
@@ -22,15 +23,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+@Service
 @RequiredArgsConstructor
 public class AuthService implements IAuthService {
     private final UserRepository userRepository;
@@ -75,12 +76,44 @@ public class AuthService implements IAuthService {
         }
 
         var user = (Users) auth.getPrincipal();
-        HashMap<String, Object> claims = new HashMap<>();
-        claims.put("fullname", user.getFullName());
+
         List<String> roles = auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
+
+        HashMap<String, Object> claims = new HashMap<>();
+        claims.put("fullname", user.getFullName());
+        claims.put("roles", roles);
+        claims.put("tokenId", UUID.randomUUID().toString());
         var token = jwtService.generateToken(claims, user);
+        return new AuthResponse(token);
+    }
+
+    @Override
+    public void logout(String token) {
+        jwtService.addTokenToBlackList(token);
+    }
+
+    @Override
+    public AuthResponse refresh(RefreshTokenRequest refreshToken) {
+        Users userDetail = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(jwtService.isTokenValid(refreshToken.token(), userDetail)){
+            throw new BusinessException(BusinessError.INVALID_TOKEN);
+        }
+
+        if(jwtService.isTokenInBlackList(refreshToken.token())){
+            throw new BusinessException(BusinessError.INVALID_TOKEN);
+        }
+
+        List<String> roles = userDetail.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        HashMap<String, Object> claims = new HashMap<>();
+        claims.put("fullname", userDetail.getFullName());
+        claims.put("roles", roles);
+        claims.put("tokenId", UUID.randomUUID().toString());
+        var token = jwtService.generateToken(claims, userDetail);
         return new AuthResponse(token);
     }
 

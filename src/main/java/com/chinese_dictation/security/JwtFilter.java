@@ -23,7 +23,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final UserDetailServiceImpl userDetailsService;
     private final JwtService jwtService;
-    private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
     @Override
     protected void doFilterInternal(
@@ -36,22 +35,26 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        String authHeader = request.getHeader("Authorization");
-        String jwt;
-        String userEmail;
-
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        jwt = authHeader.substring(7);
-
-        if (jwt.isEmpty()) {
+        String jwt = extractTokenFromRequest(request);
+        if (jwt == null || jwtService.isTokenInBlackList(jwt)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        userEmail = jwtService.extractUsername(jwt);
+        addUserToSecurityContext(request, jwt);
+        filterChain.doFilter(request, response);
+    }
+
+    private String extractTokenFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
+    private void addUserToSecurityContext(HttpServletRequest request, String jwt) {
+        String userEmail = jwtService.extractUsername(jwt);
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
             if (jwtService.isTokenValid(jwt, userDetails)) {
@@ -62,6 +65,5 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
-        filterChain.doFilter(request, response);
     }
 }
