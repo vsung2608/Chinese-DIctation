@@ -10,7 +10,7 @@ import com.chinese_dictation.model.dto.response.AuthResponse;
 import com.chinese_dictation.model.dto.response.UserResponse;
 import com.chinese_dictation.model.entity.Role;
 import com.chinese_dictation.model.entity.Token;
-import com.chinese_dictation.model.entity.User;
+import com.chinese_dictation.model.entity.Users;
 import com.chinese_dictation.repository.RoleRepository;
 import com.chinese_dictation.repository.TokenRepository;
 import com.chinese_dictation.repository.UserRepository;
@@ -18,7 +18,6 @@ import com.chinese_dictation.security.JwtService;
 import com.chinese_dictation.service.IAuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -43,12 +42,9 @@ public class AuthService implements IAuthService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${application.emailing.frontend.activation-url}")
-    private String activationUrl;
-
     @Override
     public UserResponse register(RegistrationRequest request){
-        User user = userMapper.toUser(request);
+        Users user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         Role role = roleRepository.findByName("USER")
@@ -78,7 +74,7 @@ public class AuthService implements IAuthService {
             throw new BusinessException(BusinessError.INVALID_EMAIL_PASSWORD);
         }
 
-        var user = (User) auth.getPrincipal();
+        var user = (Users) auth.getPrincipal();
         HashMap<String, Object> claims = new HashMap<>();
         claims.put("fullname", user.getFullName());
         List<String> roles = auth.getAuthorities().stream()
@@ -99,7 +95,7 @@ public class AuthService implements IAuthService {
         }
 
         var user = userRepository.findById(emailTokenSaved.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Users not found"));
 
         user.setEnabled(true);
         userRepository.save(user);
@@ -108,13 +104,14 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public void sendValidationEmail(User user) {
+    public void sendValidationEmail(Users user) {
         var activationCode = generateAndSaveEmailToken(user);
-        // Send email
+
+        emailService.sendActivationEmail(activationCode, user.getFullName(), user.getUsername());
     }
 
     @Override
-    public String generateAndSaveEmailToken(User user){
+    public String generateAndSaveEmailToken(Users user){
         var activationCode = generateActivationCode(6);
 
         var emailToken = Token.builder()

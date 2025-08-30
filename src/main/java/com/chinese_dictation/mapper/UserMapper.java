@@ -2,12 +2,12 @@ package com.chinese_dictation.mapper;
 
 import com.chinese_dictation.model.dto.request.RegistrationRequest;
 import com.chinese_dictation.model.dto.response.UserResponse;
-import com.chinese_dictation.model.entity.User;
+import com.chinese_dictation.model.entity.Users;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
-    public UserResponse toUserResponse(User user) {
+    public UserResponse toUserResponse(Users user) {
         return new UserResponse(
                 user.getId(),
                 user.getUsername(),
@@ -20,8 +20,8 @@ public class UserMapper {
         );
     }
 
-    public User toUser(RegistrationRequest request) {
-        return User.builder()
+    public Users toUser(RegistrationRequest request) {
+        return Users.builder()
                 .username(request.username())
                 .fullName(request.fullName())
                 .build();
