@@ -5,23 +5,18 @@ import com.chinese_dictation.model.dto.request.RefreshTokenRequest;
 import com.chinese_dictation.model.dto.request.RegistrationRequest;
 import com.chinese_dictation.model.dto.response.AuthResponse;
 import com.chinese_dictation.model.dto.response.UserResponse;
-import com.chinese_dictation.security.JwtService;
-import com.chinese_dictation.service.iplm.AuthService;
+import com.chinese_dictation.service.IAuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
-    private final AuthService authService;
-    private final JwtService jwtService;
+    private final IAuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@RequestBody @Valid RegistrationRequest request) {
@@ -45,6 +40,12 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshTokenRequest refreshToken) {
         return ResponseEntity.ok(authService.refresh(refreshToken));
+    }
+
+    @PostMapping("/activation")
+    public ResponseEntity<String> activation(@RequestParam("code") String code) {
+        authService.activationAccount(code);
+        return ResponseEntity.ok("Activation successful");
     }
 
     private String extractTokenFromRequest(HttpServletRequest request) {

@@ -6,9 +6,7 @@ import com.chinese_dictation.model.dto.request.RegistrationRequest;
 import com.chinese_dictation.model.dto.response.AuthResponse;
 import com.chinese_dictation.model.dto.response.UserResponse;
 import com.chinese_dictation.model.entity.Users;
-import org.springframework.stereotype.Service;
 
-@Service
 public interface IAuthService {
     UserResponse register(RegistrationRequest request);
 

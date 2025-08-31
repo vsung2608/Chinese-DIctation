@@ -12,6 +12,6 @@ public record UserResponse(
         Integer lessonsCompleted,
         LocalDateTime createdAt,
         LocalDateTime lastLogin,
-        Boolean isActive
+        String avatarUrl
 ) {
 }

@@ -1,6 +1,7 @@
 package com.chinese_dictation.mapper;
 
 import com.chinese_dictation.model.dto.request.RegistrationRequest;
+import com.chinese_dictation.model.dto.request.UserRequest;
 import com.chinese_dictation.model.dto.response.UserResponse;
 import com.chinese_dictation.model.entity.Users;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ public class UserMapper {
                 user.getLessonsCompleted(),
                 user.getCreatedAt(),
                 user.getLastLogin(),
-                user.getIsActive()
+                user.getAvatarUrl()
         );
     }
 

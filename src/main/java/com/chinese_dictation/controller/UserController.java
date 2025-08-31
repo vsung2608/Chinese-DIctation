@@ -1,10 +1,47 @@
 package com.chinese_dictation.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.chinese_dictation.model.dto.request.ChangePasswordRequest;
+import com.chinese_dictation.model.dto.request.UserRequest;
+import com.chinese_dictation.model.dto.response.UserResponse;
+import com.chinese_dictation.service.IUserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
+    private final IUserService userService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getProfile(@PathVariable("id") Long id){
+        return ResponseEntity.ok(userService.getProfile(id));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getAllUsers(){
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @PutMapping
+    public ResponseEntity<UserResponse> updateProfile(@RequestBody UserRequest request){
+        return ResponseEntity.ok(userService.updateProfile(request));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest request){
+        userService.changePassword(request);
+        return ResponseEntity.ok("Cập nhật mật khẩu thành công");
+    }
+
+    @PostMapping("/change-email")
+    public ResponseEntity<String> changeEmail(@RequestParam("id") Long id, @RequestParam("email") String email){
+        userService.changeEmail(id, email);
+        return ResponseEntity.ok("Cập nhật email thành công");
+    }
 }

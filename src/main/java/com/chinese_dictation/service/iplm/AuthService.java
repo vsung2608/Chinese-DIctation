@@ -19,6 +19,9 @@ import com.chinese_dictation.security.JwtService;
 import com.chinese_dictation.service.IAuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,6 +34,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService implements IAuthService {
@@ -46,9 +50,9 @@ public class AuthService implements IAuthService {
     @Override
     public UserResponse register(RegistrationRequest request){
         Users user = userMapper.toUser(request);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.password()));
 
-        Role role = roleRepository.findByName("USER")
+        Role role = roleRepository.findByName(com.chinese_dictation.model.enums.Role.USER)
                 .orElseThrow(() -> new EntityNotFoundException("Role USER not found"));
 
         user.setRoles(new ArrayList<>(Collections.singleton(role)));
@@ -72,6 +76,7 @@ public class AuthService implements IAuthService {
                             request.password())
             );
         }catch (Exception e){
+            log.error(e.getMessage());
             throw new BusinessException(BusinessError.INVALID_EMAIL_PASSWORD);
         }
 
