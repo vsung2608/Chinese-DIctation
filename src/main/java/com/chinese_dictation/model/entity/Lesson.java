@@ -15,13 +15,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@NamedEntityGraph(
+        name = "Lesson.withSentences",
+        attributeNodes = @NamedAttributeNode("sentences")
+)
 public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String title;
+    private String titleVietnamese;
+
+    @Column(nullable = false)
+    private String titleChinese;
 
     private String description;
 

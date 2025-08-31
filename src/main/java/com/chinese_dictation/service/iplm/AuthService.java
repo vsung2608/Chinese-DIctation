@@ -29,6 +29,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ import java.util.*;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthService implements IAuthService {
     private final UserRepository userRepository;

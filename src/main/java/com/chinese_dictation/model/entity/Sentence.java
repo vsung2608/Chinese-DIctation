@@ -37,10 +37,4 @@ public class Sentence {
 
     @Column(name = "end_time_seconds")
     private Double endTimeSeconds;
-
-    @Column(name = "play_speed")
-    private Double playSpeed = 1.0;
-
-    @Column(name = "is_optional")
-    private Boolean isOptional = false;
 }
