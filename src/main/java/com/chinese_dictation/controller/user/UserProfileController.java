@@ -1,4 +1,4 @@
-package com.chinese_dictation.controller;
+package com.chinese_dictation.controller.user;
 
 import com.chinese_dictation.model.dto.request.ChangePasswordRequest;
 import com.chinese_dictation.model.dto.request.UserRequest;
@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserProfileController {
     private final IUserService userService;
 
     @GetMapping("/{id}")

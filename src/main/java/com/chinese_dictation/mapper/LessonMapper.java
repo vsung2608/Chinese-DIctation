@@ -6,6 +6,8 @@ import com.chinese_dictation.model.entity.Lesson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
 @Component
 @RequiredArgsConstructor
 public class LessonMapper {
@@ -37,9 +39,7 @@ public class LessonMapper {
                 .displayOrder(request.displayOrder())
                 .totalSentences(request.totalSentences())
                 .estimatedDurationSeconds(request.estimatedDurationSeconds())
-                .sentences(request.sentences().stream()
-                        .map(sentenceMapper::toEntity)
-                        .toList())
+                .sentences(new ArrayList<>())
                 .build();
     }
 }

@@ -1,0 +1,16 @@
+package com.chinese_dictation.service;
+
+import com.chinese_dictation.model.dto.request.NewCommentRequest;
+import com.chinese_dictation.model.dto.request.UpdateCommentRequest;
+import com.chinese_dictation.model.dto.response.CommentResponse;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+public interface ICommentService {
+    CommentResponse createComment(MultipartFile attachImage, NewCommentRequest request);
+    CommentResponse updateComment(Long id, UpdateCommentRequest request);
+    List<CommentResponse> getComment(Long lessonId);
+    List<CommentResponse> getReplyComment(Long parentCommentId);
+    void deleteComment(Long commentId);
+}

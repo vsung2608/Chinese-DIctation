@@ -1,5 +1,6 @@
 package com.chinese_dictation.service.iplm;
 
+import com.chinese_dictation.model.dto.response.FileUploadResponse;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.Map;
 public class CloudinaryService {
     private final Cloudinary cloudinary;
 
-    public String uploadImage(MultipartFile file) throws IOException {
+    public FileUploadResponse uploadImage(MultipartFile file) throws IOException {
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
                 ObjectUtils.asMap(
                         "resource_type", "image",
@@ -24,26 +25,32 @@ public class CloudinaryService {
                                 "fetch_format", "auto"
                         )
                 ));
-        return uploadResult.get("secure_url").toString();
+        return new FileUploadResponse(
+                uploadResult.get("secure_url").toString(),
+                uploadResult.get("public_id").toString()
+        );
     }
 
-    public String uploadAudio(MultipartFile file) throws IOException {
+    public FileUploadResponse uploadAudio(MultipartFile file) throws IOException {
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
                 ObjectUtils.asMap(
                         "resource_type", "video",
                         "folder", "audios",
                         "format", "mp3"
                 ));
-        return uploadResult.get("secure_url").toString();
+        return new FileUploadResponse(
+                uploadResult.get("secure_url").toString(),
+                uploadResult.get("public_id").toString()
+        );
     }
 
-    public boolean deleteFile(String publicId, String resourceType) {
-        try {
-            Map result = cloudinary.uploader().destroy(publicId,
-                    ObjectUtils.asMap("resource_type", resourceType.equals("image") ? "image" : "video"));
-            return "ok".equals(result.get("result"));
-        } catch (IOException e) {
-            return false;
+    public void deleteFile(String publicId, String resourceType) throws IOException {
+        Map deleteResult = cloudinary.uploader().destroy(publicId,
+                ObjectUtils.asMap("resource_type", resourceType));
+
+        String result = deleteResult.get("result").toString();
+        if (!"ok".equals(result)) {
+            throw new IOException("Failed to delete file: " + result);
         }
     }
 }

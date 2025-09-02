@@ -23,6 +23,7 @@ public class SentenceMapper {
         return Sentence.builder()
                 .chineseText(request.chineseText())
                 .pinyinText(request.pinyinText())
+                .vietnameseTranslation(request.vietnameseTranslation())
                 .sentenceOrder(request.sentenceOrder())
                 .startTimeSeconds(request.startTimeSeconds())
                 .endTimeSeconds(request.endTimeSeconds())

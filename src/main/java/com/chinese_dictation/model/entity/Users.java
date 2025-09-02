@@ -42,6 +42,9 @@ public class Users implements UserDetails {
     @Column(name = "lessons_completed")
     private Integer lessonsCompleted = 0;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
