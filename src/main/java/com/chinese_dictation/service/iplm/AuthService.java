@@ -12,6 +12,7 @@ import com.chinese_dictation.model.dto.response.UserResponse;
 import com.chinese_dictation.model.entity.Role;
 import com.chinese_dictation.model.entity.Token;
 import com.chinese_dictation.model.entity.Users;
+import com.chinese_dictation.model.enums.UserStatus;
 import com.chinese_dictation.repository.RoleRepository;
 import com.chinese_dictation.repository.TokenRepository;
 import com.chinese_dictation.repository.UserRepository;
@@ -20,8 +21,6 @@ import com.chinese_dictation.service.IAuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -58,6 +57,7 @@ public class AuthService implements IAuthService {
                 .orElseThrow(() -> new EntityNotFoundException("Role USER not found"));
 
         user.setRoles(new ArrayList<>(Collections.singleton(role)));
+        user.setStatus(UserStatus.INACTIVE);
 
         try {
             userRepository.save(user);
@@ -93,7 +93,7 @@ public class AuthService implements IAuthService {
         claims.put("roles", roles);
         claims.put("tokenId", UUID.randomUUID().toString());
         var token = jwtService.generateToken(claims, user);
-        return new AuthResponse(token);
+        return new AuthResponse(token, jwtService.extractExpiration(token).getTime());
     }
 
     @Override
@@ -104,7 +104,7 @@ public class AuthService implements IAuthService {
     @Override
     public AuthResponse refresh(RefreshTokenRequest refreshToken) {
         Users userDetail = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(jwtService.isTokenValid(refreshToken.token(), userDetail)){
+        if(!jwtService.isTokenValid(refreshToken.token(), userDetail)){
             throw new BusinessException(BusinessError.INVALID_TOKEN);
         }
 
@@ -121,7 +121,7 @@ public class AuthService implements IAuthService {
         claims.put("roles", roles);
         claims.put("tokenId", UUID.randomUUID().toString());
         var token = jwtService.generateToken(claims, userDetail);
-        return new AuthResponse(token);
+        return new AuthResponse(token, jwtService.extractExpiration(token).getTime());
     }
 
     @Override
@@ -138,6 +138,7 @@ public class AuthService implements IAuthService {
                 .orElseThrow(() -> new RuntimeException("Users not found"));
 
         user.setEnabled(true);
+        user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);
         emailTokenSaved.setValidatedAt(LocalDateTime.now());
         tokenRepository.save(emailTokenSaved);

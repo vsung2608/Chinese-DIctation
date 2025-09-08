@@ -40,10 +40,10 @@ public class LessonService implements ILessonService {
 
     @Override
     public LessonResponse getLessonById(Long id) {
-        Lesson lesson = lessonRepository.findById(id)
+        Lesson lesson = lessonRepository.findWithSentencesById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Lesson not found"));
 
-        return lessonMapper.toLessonResponse(lesson);
+        return lessonMapper.toLessonWithSentencesResponse(lesson);
     }
 
     @Transactional
@@ -109,8 +109,8 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public List<LessonResponse> getLessonByCategoryAndLevel(Long categoryId, VocabularyLevel level) {
-        return lessonRepository.findAllCategoryAndLevel(categoryId, level).stream()
+    public List<LessonResponse> getLessonByCategoryAndLevel(Long categoryId, VocabularyLevel level, Long userId) {
+        return lessonRepository.findAllCategoryAndLevel(categoryId, level, userId).stream()
                 .map(lessonMapper::toLessonResponse)
                 .toList();
     }

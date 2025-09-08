@@ -13,6 +13,6 @@ public interface ILessonService {
     LessonResponse createLesson(LessonRequest request, MultipartFile fileAudio);
     LessonResponse updateLesson(Long id, LessonRequest request);
     void deleteLesson(Long id);
-    List<LessonResponse> getLessonByCategoryAndLevel(Long categoryId, VocabularyLevel level);
+    List<LessonResponse> getLessonByCategoryAndLevel(Long categoryId, VocabularyLevel level, Long userId);
     DataPagedResponse<LessonResponse> getLessonPaged(int size, int page);
 }

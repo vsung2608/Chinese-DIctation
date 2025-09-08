@@ -1,6 +1,7 @@
 package com.chinese_dictation.service.iplm;
 
 import com.chinese_dictation.model.dto.response.FileUploadResponse;
+import com.chinese_dictation.service.ICloudinaryService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class CloudinaryService {
+public class CloudinaryService implements ICloudinaryService {
     private final Cloudinary cloudinary;
 
     public FileUploadResponse uploadImage(MultipartFile file) throws IOException {

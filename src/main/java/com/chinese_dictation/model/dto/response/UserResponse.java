@@ -8,10 +8,11 @@ public record UserResponse(
         Long id,
         String username,
         String fullName,
-        Integer totalScore,
-        Integer lessonsCompleted,
         LocalDateTime createdAt,
         LocalDateTime lastLogin,
-        String avatarUrl
+        String avatarUrl,
+        String status,
+        String countryName,
+        String countryCode
 ) {
 }

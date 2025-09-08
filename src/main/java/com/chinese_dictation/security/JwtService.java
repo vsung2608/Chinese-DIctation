@@ -94,7 +94,7 @@ public class JwtService {
             Claims claims = extractAllClaims(token);
             String tokenId = claims.get("tokenId").toString();
 
-            if (isTokenExpired(token)) {
+            if (!isTokenExpired(token)) {
                 // Tính thời gian còn lại đến khi token hết hạn
                 long ttl = extractExpiration(token).getTime() - System.currentTimeMillis();
 

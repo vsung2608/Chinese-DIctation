@@ -6,10 +6,7 @@ import com.chinese_dictation.model.dto.response.UserResponse;
 import com.chinese_dictation.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -20,12 +17,6 @@ public class UserProfileController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getProfile(@PathVariable("id") Long id){
         return ResponseEntity.ok(userService.getProfile(id));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers(){
-        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @PutMapping

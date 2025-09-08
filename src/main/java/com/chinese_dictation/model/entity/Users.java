@@ -1,11 +1,14 @@
 package com.chinese_dictation.model.entity;
 
+import com.chinese_dictation.model.enums.UserStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Users implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,17 +40,12 @@ public class Users implements UserDetails {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @Column(name = "total_score")
-    private Integer totalScore = 0;
-
-    @Column(name = "lessons_completed")
-    private Integer lessonsCompleted = 0;
-
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Comment> comments;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @CreatedDate
+    private LocalDateTime createdAt;
 
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
@@ -57,6 +56,12 @@ public class Users implements UserDetails {
     private boolean accountLocked;
 
     private boolean enabled;
+
+    private UserStatus status;
+
+    private String countryName;
+
+    private String countryCode;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonManagedReference

@@ -5,17 +5,19 @@ import com.chinese_dictation.exception.BusinessException;
 import com.chinese_dictation.mapper.UserMapper;
 import com.chinese_dictation.model.dto.request.ChangePasswordRequest;
 import com.chinese_dictation.model.dto.request.UserRequest;
+import com.chinese_dictation.model.dto.response.DataPagedResponse;
 import com.chinese_dictation.model.dto.response.UserResponse;
 import com.chinese_dictation.model.entity.Users;
 import com.chinese_dictation.repository.UserRepository;
 import com.chinese_dictation.service.IUserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -32,10 +34,18 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<UserResponse> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(userMapper::toUserResponse)
-                .toList();
+    public DataPagedResponse<UserResponse> getAllUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Users> users = userRepository.findAll(pageable);
+        return new DataPagedResponse<>(
+                page,
+                users.getTotalPages(),
+                users.getSize(),
+                users.getTotalElements(),
+                users.getContent().stream()
+                        .map(userMapper::toUserResponse)
+                        .toList()
+        );
     }
 
     @Override
@@ -66,6 +76,12 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new BusinessException(BusinessError.EMAIL_EXISTED));
         user.setUsername(email);
         userRepository.save(user);
+    }
+
+    @Override
+    public void blockUser(Long id) {
+        Users user = findUserById(id);
+        user.setEnabled(false);
     }
 
     private Users findUserById(Long id) {

@@ -13,11 +13,19 @@ import java.util.Optional;
 
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
-    @EntityGraph("Lesson.withSentences")
     Optional<Lesson> findById(Long id);
 
-    @Query("SELECT l FROM Lesson l WHERE l.category.id = :categoryId AND l.level = :level")
+    @EntityGraph("Lesson.withSentences")
+    Optional<Lesson> findWithSentencesById(Long id);
+
+    @Query("SELECT new com.chinese_dictation.model.dto.response.LessonWithProgressResponse(" +
+            "l.id, l.titleChinese, l.titleVietnamese, l.level, l.totalSentences, l.estimatedDurationSeconds, " +
+            "COALESCE(CAST(up.status AS string), 'NOT_STARTED')) " +
+            "FROM Lesson l " +
+            "LEFT JOIN UserProgress up ON l.id = up.lesson.id AND up.user.id = :userId " +
+            "WHERE l.category.id = :categoryId AND l.level = :level")
     List<Lesson> findAllCategoryAndLevel(
             @Param("categoryId") Long categoryId,
-            @Param("level") VocabularyLevel level);
+            @Param("level") VocabularyLevel level,
+            @Param("userId") Long userId);
 }

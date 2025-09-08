@@ -1,19 +1,22 @@
 package com.chinese_dictation.model.dto.response;
 
 import com.chinese_dictation.model.enums.VocabularyLevel;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.util.List;
 
-public record LessonResponse (
-        Long id,
-        String titleChinese,
-        String titleVietnamese,
-        String description,
-        String audioFilePath,
-        VocabularyLevel level,
-        Integer displayOrder,
-        Integer totalSentences,
-        Integer estimatedDurationSeconds,
-        List<SentenceResponse> sentences
-){
+@Getter
+@Builder
+public class LessonResponse{
+    private Long id;
+    private String titleChinese;
+    private String titleVietnamese;
+    private String description;
+    private String audioFilePath;
+    private VocabularyLevel level;
+    private Integer displayOrder;
+    private Integer totalSentences;
+    private Integer estimatedDurationSeconds;
+    private List<SentenceResponse> sentences;
 }

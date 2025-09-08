@@ -13,21 +13,35 @@ import java.util.ArrayList;
 public class LessonMapper {
     private final SentenceMapper sentenceMapper;
 
-    public LessonResponse toLessonResponse(Lesson lesson) {
-        return new LessonResponse(
-                lesson.getId(),
-                lesson.getTitleChinese(),
-                lesson.getTitleVietnamese(),
-                lesson.getDescription(),
-                lesson.getAudioFilePath(),
-                lesson.getLevel(),
-                lesson.getDisplayOrder(),
-                lesson.getTotalSentences(),
-                lesson.getEstimatedDurationSeconds(),
-                lesson.getSentences().stream()
+    public LessonResponse toLessonWithSentencesResponse(Lesson lesson) {
+        return LessonResponse.builder()
+                .id(lesson.getId())
+                .titleChinese(lesson.getTitleChinese())
+                .titleVietnamese(lesson.getTitleVietnamese())
+                .description(lesson.getDescription())
+                .audioFilePath(lesson.getAudioFilePath())
+                .level(lesson.getLevel())
+                .displayOrder(lesson.getDisplayOrder())
+                .totalSentences(lesson.getTotalSentences())
+                .estimatedDurationSeconds(lesson.getEstimatedDurationSeconds())
+                .sentences(lesson.getSentences().stream()
                         .map(sentenceMapper::toResponse)
-                        .toList()
-        );
+                        .toList())
+                .build();
+    }
+
+    public LessonResponse toLessonResponse(Lesson lesson) {
+        return LessonResponse.builder()
+                .id(lesson.getId())
+                .titleChinese(lesson.getTitleChinese())
+                .titleVietnamese(lesson.getTitleVietnamese())
+                .description(lesson.getDescription())
+                .audioFilePath(lesson.getAudioFilePath())
+                .level(lesson.getLevel())
+                .displayOrder(lesson.getDisplayOrder())
+                .totalSentences(lesson.getTotalSentences())
+                .estimatedDurationSeconds(lesson.getEstimatedDurationSeconds())
+                .build();
     }
 
     public Lesson toLesson(LessonRequest request) {

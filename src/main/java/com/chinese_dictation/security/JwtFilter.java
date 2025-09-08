@@ -1,5 +1,6 @@
 package com.chinese_dictation.security;
 
+import com.chinese_dictation.model.entity.Users;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,12 +31,13 @@ public class JwtFilter extends OncePerRequestFilter {
             @NotNull HttpServletResponse response,
             @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (request.getServletPath().contains("/auth") || request.getServletPath().contains("/general")) {
+        if (request.getServletPath().contains("/auth/login") || request.getServletPath().contains("/auth/register")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String jwt = extractTokenFromRequest(request);
+
         if (jwt == null || jwtService.isTokenInBlackList(jwt)) {
             filterChain.doFilter(request, response);
             return;
@@ -56,8 +58,9 @@ public class JwtFilter extends OncePerRequestFilter {
     private void addUserToSecurityContext(HttpServletRequest request, String jwt) {
         String userEmail = jwtService.extractUsername(jwt);
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+            Users userDetails = userDetailsService.loadUserByUsername(userEmail);
             if (jwtService.isTokenValid(jwt, userDetails)) {
+
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()
                 );

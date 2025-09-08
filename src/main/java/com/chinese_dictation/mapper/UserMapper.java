@@ -13,11 +13,12 @@ public class UserMapper {
                 user.getId(),
                 user.getUsername(),
                 user.getFullName(),
-                user.getTotalScore(),
-                user.getLessonsCompleted(),
                 user.getCreatedAt(),
                 user.getLastLogin(),
-                user.getAvatarUrl()
+                user.getAvatarUrl(),
+                user.getStatus().name(),
+                user.getCountryName(),
+                user.getCountryCode()
         );
     }
 
@@ -25,6 +26,7 @@ public class UserMapper {
         return Users.builder()
                 .username(request.username())
                 .fullName(request.fullName())
+                .isActive(true)
                 .build();
     }
 }

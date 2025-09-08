@@ -42,7 +42,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.refresh(refreshToken));
     }
 
-    @PostMapping("/activation")
+    @PostMapping("/activate")
     public ResponseEntity<String> activation(@RequestParam("code") String code) {
         authService.activationAccount(code);
         return ResponseEntity.ok("Activation successful");

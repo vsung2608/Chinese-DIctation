@@ -4,6 +4,7 @@ import com.chinese_dictation.mapper.CommentMapper;
 import com.chinese_dictation.model.dto.request.NewCommentRequest;
 import com.chinese_dictation.model.dto.request.UpdateCommentRequest;
 import com.chinese_dictation.model.dto.response.CommentResponse;
+import com.chinese_dictation.model.dto.response.DataPagedResponse;
 import com.chinese_dictation.model.dto.response.FileUploadResponse;
 import com.chinese_dictation.model.entity.Comment;
 import com.chinese_dictation.model.entity.Lesson;
@@ -16,6 +17,9 @@ import com.chinese_dictation.service.ICommentService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -93,17 +97,33 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public List<CommentResponse> getComment(Long lessonId){
-        return commentRepository.findByLessonId(lessonId).stream()
-                .map(commentMapper::CommentToCommentResponse)
-                .toList();
+    public DataPagedResponse<CommentResponse> getComment(Long lessonId, int page, int size){
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Comment> comments = commentRepository.findByLessonId(lessonId, pageable);
+        return new DataPagedResponse<>(
+                page,
+                comments.getTotalPages(),
+                comments.getSize(),
+                comments.getTotalElements(),
+                comments.getContent().stream()
+                        .map(commentMapper::CommentToCommentResponse)
+                        .toList()
+        );
     }
 
     @Override
-    public List<CommentResponse> getReplyComment(Long parentCommentId){
-        return commentRepository.findByParentCommentId(parentCommentId).stream()
-                .map(commentMapper::CommentToCommentResponse)
-                .toList();
+    public DataPagedResponse<CommentResponse> getReplyComment(Long parentCommentId, int page, int size){
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Comment> comments = commentRepository.findByParentCommentId(parentCommentId, pageable);
+        return new DataPagedResponse<>(
+                page,
+                comments.getTotalPages(),
+                comments.getSize(),
+                comments.getTotalElements(),
+                comments.getContent().stream()
+                        .map(commentMapper::CommentToCommentResponse)
+                        .toList()
+        );
     }
 
     @Override

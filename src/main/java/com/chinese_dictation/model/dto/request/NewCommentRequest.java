@@ -4,9 +4,6 @@ public record NewCommentRequest (
         Long lessonId,
         Long userId,
         String content,
-        String userName,
-        String userAvatarUrl,
-        Long parentCommentId,
-        String attachIamgeUrl
+        Long parentCommentId
 ){
 }
