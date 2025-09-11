@@ -8,7 +8,6 @@ import com.chinese_dictation.model.dto.response.DataPagedResponse;
 import com.chinese_dictation.model.dto.response.FileUploadResponse;
 import com.chinese_dictation.model.entity.Comment;
 import com.chinese_dictation.model.entity.Lesson;
-import com.chinese_dictation.model.entity.Sentence;
 import com.chinese_dictation.model.entity.Users;
 import com.chinese_dictation.repository.CommentRepository;
 import com.chinese_dictation.repository.LessonRepository;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -39,8 +37,8 @@ public class CommentService implements ICommentService {
 
     @Transactional
     @Override
-    public CommentResponse createComment(MultipartFile attachImage, NewCommentRequest request) {
-        Users user = userRepository.findById(request.userId())
+    public CommentResponse createComment(MultipartFile attachImage, NewCommentRequest request, Long userId) {
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User Not Found"));
 
         Lesson lesson = lessonRepository.findById(request.lessonId())
@@ -99,7 +97,22 @@ public class CommentService implements ICommentService {
     @Override
     public DataPagedResponse<CommentResponse> getComment(Long lessonId, int page, int size){
         Pageable pageable = PageRequest.of(page-1, size);
-        Page<Comment> comments = commentRepository.findByLessonId(lessonId, pageable);
+        Page<Comment> comments = commentRepository.findByLessonIdAndParentCommentIdIsNull(lessonId, pageable);
+        return new DataPagedResponse<>(
+                page,
+                comments.getTotalPages(),
+                comments.getSize(),
+                comments.getTotalElements(),
+                comments.getContent().stream()
+                        .map(commentMapper::CommentToCommentResponse)
+                        .toList()
+        );
+    }
+
+    @Override
+    public DataPagedResponse<CommentResponse> getCommentOrderByDate(int page, int size) {
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Comment> comments = commentRepository.findByOrderByCreatedAtDesc(pageable);
         return new DataPagedResponse<>(
                 page,
                 comments.getTotalPages(),

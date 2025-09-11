@@ -6,6 +6,7 @@ import com.chinese_dictation.model.dto.request.LessonRequest;
 import com.chinese_dictation.model.dto.response.DataPagedResponse;
 import com.chinese_dictation.model.dto.response.FileUploadResponse;
 import com.chinese_dictation.model.dto.response.LessonResponse;
+import com.chinese_dictation.model.dto.response.LessonWithProgressResponse;
 import com.chinese_dictation.model.entity.Category;
 import com.chinese_dictation.model.entity.Lesson;
 import com.chinese_dictation.model.entity.Sentence;
@@ -109,10 +110,8 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public List<LessonResponse> getLessonByCategoryAndLevel(Long categoryId, VocabularyLevel level, Long userId) {
-        return lessonRepository.findAllCategoryAndLevel(categoryId, level, userId).stream()
-                .map(lessonMapper::toLessonResponse)
-                .toList();
+    public List<LessonWithProgressResponse> getLessonByCategoryAndLevel(Long categoryId, VocabularyLevel level, Long userId) {
+        return lessonRepository.findAllCategoryAndLevel(categoryId, level, userId);
     }
 
     @Override

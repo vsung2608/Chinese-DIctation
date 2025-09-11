@@ -12,4 +12,5 @@ public interface IUserService {
     void changePassword(ChangePasswordRequest request);
     void changeEmail(Long id, String email);
     void blockUser(Long id);
+    void unblockUser(Long id);
 }

@@ -36,7 +36,7 @@ public class UserProgress {
     private Integer currentSentenceIndex;
 
     private Integer totalAttempts;
-    private Integer totalTimeSpentSeconds;
+    private Long totalTimeSpentSeconds;
 
     @CreatedDate
     private LocalDateTime createdAt;

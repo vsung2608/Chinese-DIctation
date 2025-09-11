@@ -4,6 +4,7 @@ import com.chinese_dictation.mapper.SentenceReportMapper;
 import com.chinese_dictation.model.dto.request.SentenceReportRequest;
 import com.chinese_dictation.model.dto.response.DataPagedResponse;
 import com.chinese_dictation.model.dto.response.SentenceReportResponse;
+import com.chinese_dictation.model.entity.Comment;
 import com.chinese_dictation.model.entity.Sentence;
 import com.chinese_dictation.model.entity.SentenceReport;
 import com.chinese_dictation.model.entity.Users;
@@ -14,6 +15,9 @@ import com.chinese_dictation.repository.UserRepository;
 import com.chinese_dictation.service.ISentenceReportService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +58,14 @@ public class SentenceReportService implements ISentenceReportService {
 
     @Override
     public DataPagedResponse<SentenceReportResponse> getSentenceReportPaged(int page, int size) {
-        return null;
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<SentenceReportResponse> comments = sentenceReportRepository.findAllWithPagination(pageable);
+        return new DataPagedResponse<>(
+                page,
+                comments.getTotalPages(),
+                comments.getSize(),
+                comments.getTotalElements(),
+                comments.getContent()
+        );
     }
 }

@@ -26,14 +26,15 @@ public class SentenceReportMapper {
     public SentenceReportResponse toSentenceReportResponse(SentenceReport sentenceReport) {
         return new SentenceReportResponse(
                 sentenceReport.getId(),
+                sentenceReport.getTitle(),
                 sentenceReport.getReason(),
                 sentenceReport.getStatus(),
                 sentenceReport.getUser().getFullName(),
                 sentenceReport.getUser().getAvatarUrl(),
-                sentenceMapper.toResponse(sentenceReport.getSentence()),
-                timeFormatterUtil.format(sentenceReport.getCreatedAt()),
-                timeFormatterUtil.format(sentenceReport.getUpdatedAt()),
-                timeFormatterUtil.format(sentenceReport.getHandledAt())
+                sentenceReport.getSentence().getId(),
+                sentenceReport.getCreatedAt(),
+                sentenceReport.getUpdatedAt(),
+                sentenceReport.getHandledAt()
         );
     }
 }

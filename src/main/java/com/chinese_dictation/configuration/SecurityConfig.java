@@ -50,7 +50,7 @@ public class SecurityConfig {
                     CorsConfiguration corsConfiguration = new CorsConfiguration();
                     corsConfiguration.setAllowedOrigins(List.of("*"));
                     corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-                    corsConfiguration.setAllowedMethods(List.of("POST", "PUT", "GET"));
+                    corsConfiguration.setAllowedMethods(List.of("POST", "PUT", "GET", "DELETE", "PATCH"));
                     return corsConfiguration;
                 }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

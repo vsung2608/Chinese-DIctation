@@ -4,11 +4,13 @@ import com.chinese_dictation.model.dto.request.NewCommentRequest;
 import com.chinese_dictation.model.dto.request.UpdateCommentRequest;
 import com.chinese_dictation.model.dto.response.CommentResponse;
 import com.chinese_dictation.model.dto.response.DataPagedResponse;
+import com.chinese_dictation.model.entity.Users;
 import com.chinese_dictation.service.iplm.CommentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,11 +22,12 @@ public class UserCommentController {
 
     @PostMapping
     public ResponseEntity<CommentResponse> createComment(
+            @AuthenticationPrincipal Users user,
             @RequestPart("comment") String commentJson,
             @RequestPart(value = "image", required = false) MultipartFile attachImage
             ) throws JsonProcessingException {
         NewCommentRequest request = new ObjectMapper().readValue(commentJson, NewCommentRequest.class);
-        return ResponseEntity.ok(commentService.createComment(attachImage, request));
+        return ResponseEntity.ok(commentService.createComment(attachImage, request, user.getId()));
     }
 
     @PutMapping("/{id}")

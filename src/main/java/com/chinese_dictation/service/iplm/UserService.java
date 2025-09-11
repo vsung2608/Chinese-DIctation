@@ -8,6 +8,7 @@ import com.chinese_dictation.model.dto.request.UserRequest;
 import com.chinese_dictation.model.dto.response.DataPagedResponse;
 import com.chinese_dictation.model.dto.response.UserResponse;
 import com.chinese_dictation.model.entity.Users;
+import com.chinese_dictation.model.enums.UserStatus;
 import com.chinese_dictation.repository.UserRepository;
 import com.chinese_dictation.service.IUserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -54,9 +55,10 @@ public class UserService implements IUserService {
 
         user.setFullName(request.fullName());
         user.setAvatarUrl(request.avatarUrl());
-        return null;
+        return userMapper.toUserResponse(user);
     }
 
+    @Transactional
     @Override
     public void changePassword(ChangePasswordRequest request) {
         Users user = findUserById(request.id());
@@ -66,22 +68,31 @@ public class UserService implements IUserService {
         }
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));
-        userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public void changeEmail(Long id, String email) {
         Users user = findUserById(id);
         userRepository.findByUsername(email)
                 .orElseThrow(() -> new BusinessException(BusinessError.EMAIL_EXISTED));
         user.setUsername(email);
-        userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public void blockUser(Long id) {
         Users user = findUserById(id);
         user.setEnabled(false);
+        user.setStatus(UserStatus.LOCKED);
+    }
+
+    @Transactional
+    @Override
+    public void unblockUser(Long id) {
+        Users user = findUserById(id);
+        user.setEnabled(true);
+        user.setStatus(UserStatus.ACTIVE);
     }
 
     private Users findUserById(Long id) {

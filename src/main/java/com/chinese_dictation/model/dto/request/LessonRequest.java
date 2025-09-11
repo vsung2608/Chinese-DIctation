@@ -1,11 +1,13 @@
 package com.chinese_dictation.model.dto.request;
 
 import com.chinese_dictation.model.enums.VocabularyLevel;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record LessonRequest(
         @Size(min = 1, max = 255, message = "Title must be between 1 and 255 characters")
         String titleChinese,

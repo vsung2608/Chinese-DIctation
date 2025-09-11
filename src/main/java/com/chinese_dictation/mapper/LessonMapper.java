@@ -2,6 +2,7 @@ package com.chinese_dictation.mapper;
 
 import com.chinese_dictation.model.dto.request.LessonRequest;
 import com.chinese_dictation.model.dto.response.LessonResponse;
+import com.chinese_dictation.model.dto.response.LessonWithProgressResponse;
 import com.chinese_dictation.model.entity.Lesson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

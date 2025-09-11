@@ -1,7 +1,5 @@
 package com.chinese_dictation.model.dto.response;
 
-import jakarta.persistence.Column;
-
 import java.time.LocalDateTime;
 
 public record UserResponse(

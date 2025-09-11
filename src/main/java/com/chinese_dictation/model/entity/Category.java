@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -21,12 +22,13 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(name = "display_order")
-    private Integer displayOrder;
+    private String imageUrl;
+
+    private String description;
 
     @Column(name = "is_active")
     private Boolean isActive = true;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private Set<Lesson> lessons;
+    private List<Lesson> lessons;
 }

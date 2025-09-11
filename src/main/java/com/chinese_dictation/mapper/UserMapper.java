@@ -27,6 +27,9 @@ public class UserMapper {
                 .username(request.username())
                 .fullName(request.fullName())
                 .isActive(true)
+                .countryCode("vn")
+                .countryName("Việt Nam")
+                .avatarUrl("https://www.lutzlawoffice.com/wp-content/uploads/2021/08/default-avatar.png")
                 .build();
     }
 }

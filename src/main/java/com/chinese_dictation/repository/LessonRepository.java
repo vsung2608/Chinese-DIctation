@@ -1,5 +1,6 @@
 package com.chinese_dictation.repository;
 
+import com.chinese_dictation.model.dto.response.LessonWithProgressResponse;
 import com.chinese_dictation.model.entity.Lesson;
 import com.chinese_dictation.model.enums.VocabularyLevel;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -24,7 +25,7 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
             "FROM Lesson l " +
             "LEFT JOIN UserProgress up ON l.id = up.lesson.id AND up.user.id = :userId " +
             "WHERE l.category.id = :categoryId AND l.level = :level")
-    List<Lesson> findAllCategoryAndLevel(
+    List<LessonWithProgressResponse> findAllCategoryAndLevel(
             @Param("categoryId") Long categoryId,
             @Param("level") VocabularyLevel level,
             @Param("userId") Long userId);

@@ -32,7 +32,7 @@ public class Comment {
     private String content;
     @Column(name = "reply_count")
     private int replyCount;
-    @Column(name = "parent_commnt_id")
+    @Column(name = "parent_comment_id")
     private Long parentCommentId;
     @CreatedDate
     @Column(name = "created_at")

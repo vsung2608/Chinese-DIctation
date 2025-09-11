@@ -1,10 +1,13 @@
 package com.chinese_dictation.controller.user;
 
 import com.chinese_dictation.model.dto.response.LessonResponse;
+import com.chinese_dictation.model.dto.response.LessonWithProgressResponse;
+import com.chinese_dictation.model.entity.Users;
 import com.chinese_dictation.model.enums.VocabularyLevel;
 import com.chinese_dictation.service.iplm.LessonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,10 +24,10 @@ public class UserLessonController {
     }
 
     @GetMapping("/level")
-    public ResponseEntity<List<LessonResponse>> getLessonByLevel(
+    public ResponseEntity<List<LessonWithProgressResponse>> getLessonByLevel(
+            @AuthenticationPrincipal Users user,
             @RequestParam("level") VocabularyLevel level,
-            @RequestParam("categoryId") Long categoryId,
-            @RequestParam("userId") Long userId) {
-        return ResponseEntity.ok(lessonService.getLessonByCategoryAndLevel(categoryId, level, userId));
+            @RequestParam("categoryId") Long categoryId) {
+        return ResponseEntity.ok(lessonService.getLessonByCategoryAndLevel(categoryId, level, user.getId()));
     }
 }

@@ -8,6 +8,7 @@ import com.chinese_dictation.model.dto.request.LoginRequest;
 import com.chinese_dictation.model.dto.request.RefreshTokenRequest;
 import com.chinese_dictation.model.dto.request.RegistrationRequest;
 import com.chinese_dictation.model.dto.response.AuthResponse;
+import com.chinese_dictation.model.dto.response.UserBasicInfoResponse;
 import com.chinese_dictation.model.dto.response.UserResponse;
 import com.chinese_dictation.model.entity.Role;
 import com.chinese_dictation.model.entity.Token;
@@ -86,14 +87,17 @@ public class AuthService implements IAuthService {
 
         List<String> roles = auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
+                .map(r -> r.replace("ROLE_", ""))
                 .toList();
 
         HashMap<String, Object> claims = new HashMap<>();
         claims.put("fullname", user.getFullName());
-        claims.put("roles", roles);
         claims.put("tokenId", UUID.randomUUID().toString());
         var token = jwtService.generateToken(claims, user);
-        return new AuthResponse(token, jwtService.extractExpiration(token).getTime());
+        return new AuthResponse(
+                token,
+                jwtService.extractExpiration(token).getTime(),
+                new UserBasicInfoResponse(user.getFullName(), user.getAvatarUrl(), roles));
     }
 
     @Override
@@ -114,14 +118,17 @@ public class AuthService implements IAuthService {
 
         List<String> roles = userDetail.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
+                .map(r -> r.replace("ROLE_", ""))
                 .toList();
 
         HashMap<String, Object> claims = new HashMap<>();
         claims.put("fullname", userDetail.getFullName());
-        claims.put("roles", roles);
         claims.put("tokenId", UUID.randomUUID().toString());
         var token = jwtService.generateToken(claims, userDetail);
-        return new AuthResponse(token, jwtService.extractExpiration(token).getTime());
+        return new AuthResponse(
+                token,
+                jwtService.extractExpiration(token).getTime(),
+                new UserBasicInfoResponse(userDetail.getFullName(), userDetail.getAvatarUrl(), roles));
     }
 
     @Override

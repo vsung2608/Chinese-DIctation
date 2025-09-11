@@ -26,4 +26,10 @@ public class AdminProfileController {
         userService.blockUser(id);
         return ResponseEntity.ok("User was blocked");
     }
+
+    @PatchMapping("/un-block/{id}")
+    public ResponseEntity<String> unblockUser(@PathVariable Long id){
+        userService.unblockUser(id);
+        return ResponseEntity.ok("User was blocked");
+    }
 }
