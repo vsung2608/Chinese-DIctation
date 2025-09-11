@@ -49,28 +49,57 @@ GRANT ALL PRIVILEGES ON DATABASE chinese_dictation TO dictation_user;
 Create an `application.properties` or `application.yml` file in `src/main/resources/`:
 
 ```properties
-# Database Configuration
-spring.datasource.url=jdbc:postgresql://localhost:5432/chinese_dictation
-spring.datasource.username=dictation_user
-spring.datasource.password=your_password
-spring.datasource.driver-class-name=org.postgresql.Driver
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
 
-# JPA/Hibernate Configuration
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=false
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring:
+  application:
+    name: chinese-dictation
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  servlet:
+    multipart:
+      max-request-size: 50MB
+      max-file-size: 50MB
 
-# JWT Configuration
-jwt.secret=your_jwt_secret_key_here
-jwt.expiration=86400000
 
-# Brevo Email Configuration
-brevo.api.key=your_brevo_api_key
-brevo.sender.email=noreply@yourdomain.com
-brevo.sender.name=Chinese Dictation App
+application:
+  security:
+    jwt:
+      expiration: 86400000
+      secret-key: ${SECRET_KEY}
+  email:
+    brevo:
+      api-key: ${BREVO_API_KEY}
+      sender-email: ${BREVO_SENDER_EMAIL}
+      sender-name: ${BREVO_SENDER_NAME}
+  cloudinary:
+    cloud-name: ${CLD_NAME}
+    api-key: ${CLD_API_KEY}
+    api-secret: ${CLD_API_SECRET}
 
-# Server Configuration
-server.port=8080
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
 ```
 
 ### 4. Install Dependencies
@@ -98,13 +127,19 @@ The application will start on `http://localhost:8080`
 ### JWT Settings
 - Configure JWT secret key in application properties
 - Set appropriate token expiration time
-- Customize token refresh logic if needed
+- Customize token refresh logic
 
 ### Email Settings (Brevo)
 1. Sign up for a Brevo account
 2. Get your API key from the dashboard
 3. Configure sender email and name
 4. Set up email templates as needed
+
+### Cloudinary Settings
+1. Sign up your Cloudinary account
+2. Generate your api_key
+3. Get your clound name, api_key and api_secret
+4. Set up Cloudinary Config
 
 ### Database Migration
 The application uses Hibernate DDL auto-update. For production, consider using Flyway or Liquibase for database migrations.
@@ -114,14 +149,6 @@ The application uses Hibernate DDL auto-update. For production, consider using F
 Once the application is running, you can access the API documentation at:
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 - API Docs: `http://localhost:8080/v3/api-docs`
-
-### Main Endpoints
-
-#### Authentication
-- `POST /api/v1/auth/register` - User registration
-- `POST /api/v1/auth/login` - User login
-- `POST /api/v1/auth/refresh` - Refresh JWT token
-- `POST /api/v1/auth/logout` - User logout
 
 ## 🧪 Testing
 
@@ -158,6 +185,11 @@ export DB_USERNAME=dictation_user
 export DB_PASSWORD=your_secure_password
 export JWT_SECRET=your_very_secure_jwt_secret
 export BREVO_API_KEY=your_brevo_api_key
+export BREV0_SENDER_EMAIL=sender_email
+export BREVO_SENDER_NAME=sender_name
+export CLD_NAME=your_cloudinary_name
+export CLD_API_KEY=your_cloudinary_service
+export CLD_API_SECRET=your_cloudinary_secret
 ```
 
 ## 📁 Project Structure
@@ -172,6 +204,7 @@ src/
 │   │       ├── controller/      # REST controllers
 │   │       ├── service/         # Business logic
 │   │       ├── repository/      # Data access layer
+│   │       ├── mapper/          # Mapping data from entiry to dto
 │   │       ├── model/           # Model layer
 |   |           ├── entity       # Entity classes
 |   |           ├── dto          # Data transfer object classes
